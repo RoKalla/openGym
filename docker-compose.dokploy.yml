@@ -1,6 +1,10 @@
 services:
   api:
-    image: ghcr.io/duartesantos8/opengym-api:latest
+    # Built from source, not pulled: the prebuilt image is the `default` target, which has no
+    # Claude Agent SDK / Codex runtime. The `coach` target adds them (docs/AI_COACH.md).
+    build:
+      context: ./api
+      target: ${API_TARGET:-coach}
     restart: unless-stopped
     env_file: .env
     environment:
@@ -11,7 +15,9 @@ services:
       - opengym-data:/data
       - opengym-coach-auth:/coach-auth
   web:
-    image: ghcr.io/duartesantos8/opengym-web:latest
+    build:
+      context: .
+      dockerfile: web/Dockerfile
     restart: unless-stopped
     depends_on:
       api:
